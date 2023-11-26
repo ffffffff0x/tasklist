@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>运行查询 v1.3.5</title>
+	<link rel="icon" type="image/x-icon" href="https://cdn.jsdelivr.net/gh/No-Github/Archive2@1.0.4/html/images/ffffffff0x-64.ico" />
+	<meta charset="utf-8">
+</head>
+<body>
+
+<center>
+	<h3>tasklist /svc && ps -aux</h3>
+	<textarea style="border:0;border-radius:5px;background-color:rgba(241,241,241,.98);width: 30%;height: 341px;padding: 10px;resize: none;" placeholder="查询" id="content"></textarea>
+	<br>
+	<br>
+	<input type="submit" id="search" value="查询" onclick="getAVName();">
+	<br>
+	<br>
+	<div>
+		<h3>查询结果</h3>
+		<textarea style="border:0;border-radius:5px;background-color:rgba(241,241,241,.98);width: 30%;height: 241px;padding: 10px;resize: none;" placeholder="杀软结果" id="result1"></textarea>
+		<textarea style="border:0;border-radius:5px;background-color:rgba(241,241,241,.98);width: 30%;height: 241px;padding: 10px;resize: none;" placeholder="其他软件结果" id="result2"></textarea>
+		<textarea style="border:0;border-radius:5px;background-color:rgba(241,241,241,.98);width: 30%;height: 241px;padding: 10px;resize: none;" placeholder="linux进程结果" id="result3"></textarea>
+	</div>
+
+</center>
+
+<script src="./JS/avlist.js"></script>
+<script src="./JS/linux.js"></script>
+<script src="./JS/tasklist.js"></script>
+<script>
+function getAVName() {
+
+	var processListText = document.getElementById('content').value;
+		// 正则表达式用于匹配每行的进程信息
+		var re = /\S+\s+(\d+)\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+(.+)/g;
+		var matches, processes = [];
+
+		// 解析每个匹配的进程信息
+		while ((matches = re.exec(processListText)) !== null) {
+			processes.push({ pid: matches[1], command: matches[2].toLowerCase() });
+		}
+
+		// 比较进程和 LinuxAvList
+		var result1 = document.getElementById('result3');
+		var htmlContent1 = "";
+		for (var i = 0; i < processes.length; i++) {
+			for (var av in LinuxAvList) {
+				if (processes[i].command.includes(av.toLowerCase())) {
+					htmlContent1 += processes[i].pid + " <=> " + processes[i].command + " <=> " + LinuxAvList[av] + "\n";
+				}
+			}
+		}
+		result1.innerHTML = htmlContent1;
+
+
+	var tasklist = document.getElementById('content').value;
+	var re = new RegExp("(.*?)\.exe", "g");
+	var tasks = tasklist.match(re);
+	var result = document.getElementById('result1');
+	var htmlContent = "";
+	for(i=0; i<Object.keys(avList).length; i++){
+		var taskid = Object.keys(avList)[i];
+		for(x=0; x<tasks.length; x++){
+			if(taskid.toLowerCase() == tasks[x].toLowerCase()){
+				htmlContent += taskid + " <=> " + avList[taskid] + "\n";  // 如果是 cf 里 需要改为 \\n
+			}
+		}
+	}
+	result.innerHTML = htmlContent;
+
+	var result = document.getElementById('result2');
+	var htmlContent = "";
+	for(i=0; i<Object.keys(taskList).length; i++){
+		var taskid = Object.keys(taskList)[i];
+		for(x=0; x<tasks.length; x++){
+			if(taskid.toLowerCase() == tasks[x].toLowerCase()){
+				htmlContent += taskid + " <=> " + taskList[taskid] + "\n";  // 如果是 cf 里 需要改为 \\n
+			}
+		}
+	}
+	result.innerHTML = htmlContent;
+
+}
+</script>
+</body>
+</html>
